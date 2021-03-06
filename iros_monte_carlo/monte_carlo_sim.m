@@ -262,6 +262,6 @@ min_match_under_data.strata_novar_time = strata_novar_time/trials;
 min_match_under_data.prob_time = prob_time/trials;
 c = clock;
 id = num2str(c(3)*24*60 + c(4)*60 + c(5));
-path = which('min_match_rand_rounding.m');
-save([path(1:end-56) 'data/min_match_under_' id '.mat'], 'min_match_under_data')
+path = which('monte_carlo_sim.m');
+save([path(1:end-34) 'data/min_match_under_' id '.mat'], 'min_match_under_data')
 

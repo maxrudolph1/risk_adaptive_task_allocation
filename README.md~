@@ -1,0 +1,6 @@
+# Code for Risk Adaptive Task Allocation work submitted to IROS2021
+
+This includes all the code that was used to generate the results found in "Desperate Times Call for Desperate Measures:Towards Risk-Adaptive Task Allocation" by Rudolph, M et. al. 
+
+## Numerical Experiments
+The code for the numerical results can be found in `iros_monte_carlo/mmonte_carlo_sim.m` and the code for plotting the results is in `iros_monte_carlo/plot_results.m`
