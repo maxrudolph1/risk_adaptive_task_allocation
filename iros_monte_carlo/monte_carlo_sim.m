@@ -11,7 +11,7 @@ S = n_species;
 T = n_traits_target;
 M = n_tasks;
 
-trials = 1;
+trials = 100;
 
 gs = GlobalSearch;
 
@@ -23,7 +23,7 @@ strata_novar_sols = zeros(n_tasks, n_species, trials);
 min_match_objective = @(X) -min_match_maxmin_prob(X);
 strata_min_match_objective = @(X) strata_min_match_obj(X);
 strata_min_match_objective_novar = @(X) strata_min_match_obj_novar(X);
-nonlincon = @(X) round_nonlincon(X);
+
 
 params = [];
 for i = 1:trials
@@ -118,7 +118,7 @@ for i = 1:trials
     tic
     % Solve STRATA optimization
     problem = createOptimProblem('fmincon', 'x0', X_init, 'objective', strata_min_match_objective,'Aineq', A,...
-        'bineq', b,'lb', lb, 'ub', ub, 'nonlcon', nonlincon, 'options', options);
+        'bineq', b,'lb', lb, 'ub', ub, 'options', options);
     
     X_sol_temp = run(gs,problem);
     [P, task_P] = min_match_prob(X_sol_temp);
@@ -206,7 +206,7 @@ for i = 1:trials
     % Solve Prob-based Method optimization
     tic
     problem =  createOptimProblem('fmincon', 'x0', X_init, 'objective', min_match_objective,'Aineq', A,...
-        'bineq', b, 'nonlcon', nonlincon, 'options', options);
+        'bineq', b, 'options', options);
     
     X_sol_temp = run(gs,problem);
     [P, task_P] = min_match_prob(X_sol_temp);

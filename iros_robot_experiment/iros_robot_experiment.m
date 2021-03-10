@@ -7,7 +7,7 @@ N = 15;
 data_path = which('iros_robot_experiment.m');
 load([data_path(1:end-23) 'params.mat']);
 STRATA = true;
-videoFlag = false;
+videoFlag = true;
 if STRATA
     X = params.strata_sol;
 else
@@ -32,11 +32,11 @@ task1_agents = [1:X(1,1) (species(1).N +1):(species(1).N +X(1,2))];
 task2_agents = [(X(1,1) + 1):(X(1,1) + X(2,1)) (task1_agents(end)+1):N];
 
 % Generate agent capabilities
-
-capabilities = [mvnrnd(params.Q_mu(1,:)', params.Q_sig(:,:,1), species(1).N); ...
-    mvnrnd(params.Q_mu(2,:)', params.Q_sig(:,:,2), species(2).N)];
+ensure_over = 1;
+capabilities = [mvnrnd(params.Q_mu(1,:)'/ensure_over, params.Q_sig(:,:,1), species(1).N); ...
+    mvnrnd(params.Q_mu(2,:)'/ensure_over, params.Q_sig(:,:,2), species(2).N)];
 capabilities(capabilities <= 0) = .001;
-
+cap0 = capabilities;
 task1_satisfied = sum(capabilities(task1_agents,1)) >= params.Y_s(1,1);
 task2_satisfied = sum(capabilities(task2_agents,2)) >= params.Y_s(2,2);
 task1_carry_cap = sum(capabilities(task1_agents,1))
@@ -89,7 +89,6 @@ tic
 
 % Import and scale the GT logo appropriately.
 [gt_img, map, alphamap] = imread('fire.png'); % Original input image file
-rock_img = imread('rock.png');
 
 % Display the image with an associated spatial referencing object.
 x_img = linspace(0, 0.1, size(gt_img,2));
@@ -122,10 +121,10 @@ line_width = 5;
 for i = 1:N
     if i <= species(1).N
         species_tag(i) = plot(0,0,'.', 'markersize', 100, 'color', [1 .5 .5]);
-        species_line(i) = line([0,0], [0,0], 'linewidth', 3, 'color', 'r');
+        species_line(i) = line([0,0], [0,0], 'linewidth', 1, 'color', 'k');
     else
         species_tag(i) =  plot(0,0,'.', 'markersize', 100, 'color', [0.5 0.5 1]);
-        species_line(i) = line([0,0], [0,0], 'linewidth', 3, 'Color', 'b');
+        species_line(i) = line([0,0], [0,0], 'linewidth', 1, 'Color', 'k');
     end
     
 end
@@ -141,16 +140,15 @@ for i = 1:N
     end
 end
 
-x_img_rock = linspace(0, 0.2, size(rock_img,2));
-y_img_rock = linspace(0, -0.2, size(rock_img,1));
+
 
 g = plot(payload_pos(1,1), payload_pos(2,1),'s', ...
-    'MarkerSize',marker_size_goal,'LineWidth',line_width,'Color','k', 'MarkerFaceColor',[1 .6 .6]);
+    'MarkerSize',marker_size_goal,'LineWidth',line_width,'Color','k', 'MarkerFaceColor',0*[1 .6 .6]);
 % g = image(x_img_rock + payload_pos(1,1), y_img_rock + payload_pos(2,1), rock_img,'CDataMapping','scaled');
 
 if videoFlag
-    vid = VideoWriter(['/Users/maxrudolph/Documents/research/rail/stratapp/' ...
-        'algo/matlab/iros_robot_experiment/iros_risk_adaptive_robotarium.mp4'], 'MPEG-4');
+    vid = VideoWriter(['/Users/maxrudolph/Documents/research/github_repos/risk_adaptive_task_allocation'...
+        '/iros_robot_experiment/iros_risk_adaptive_robotarium.mp4'], 'MPEG-4');
     vid.Quality = 100;
     vid.FrameRate = 72;
     open(vid);
@@ -219,7 +217,7 @@ for t = 1:iterations
     spray_dis = .5;
     [fire_out, capabilities] = update_fire(x, task2_agents, capabilities, spray_dis, fire_out, fire_pos, fire_handle);
     
-    update_cap_lines(x,water_cap, carry_cap, capabilities)
+    update_cap_lines(x,water_cap, carry_cap, capabilities, cap0)
     for i = 1:N
         
         if ~isempty(find(i == task1_agents))
@@ -291,7 +289,6 @@ for fo = found_idx
 end
 
 end
-
 function update_plot_circles(x,handl, species, task1_agents, capabilities)
 
 t = 0; %linspace(0,2*pi,1);
@@ -305,9 +302,8 @@ for i = 1:numel(x)/3
     end
 end
 end
-
-function update_cap_lines(x,water_cap, carry_cap, capabilities)
-norm_cap = capabilities./max(capabilities,[],1);
+function update_cap_lines(x,water_cap, carry_cap, capabilities, cap0)
+norm_cap = capabilities./max(cap0,[],1);
 t = 0; %linspace(0,2*pi,1);
 water_offset = [.1; .1];
 carry_offset = [.15 .1];
