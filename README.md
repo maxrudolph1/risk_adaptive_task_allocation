@@ -1,4 +1,4 @@
-# Code for Risk Adaptive Task Allocation work submitted to IROS2021
+# Risk Adaptive Task Allocation work submitted to IROS2021
 
 This includes all the code that was used to generate the results found in "Desperate Times Call for Desperate Measures:Towards Risk-Adaptive Task Allocation" by Max Rudolph, Sonia Chernova, and Harish Ravichandar
 
